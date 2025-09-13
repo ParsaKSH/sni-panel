@@ -28,13 +28,45 @@
     button{cursor:pointer;border:1px solid #1b8f82;background:#134a53}
     button:hover{filter:brightness(1.06)}
     .ghost{background:transparent;border-color:#2a4d58}
-    .ok{background:#0f3f2a;border-color:#1b6d48}
+    .ok{background:#0f3ف2a;border-color:#1b6d48}
     .danger{background:#3d1414;border-color:#7a2020}
     table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden}
     th,td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-size:13px}
     th{color:#b9cbd0;background:#1a323a}
     .muted{color:var(--muted)}
     .tag{padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px;display:inline-block}
+
+    /* --- Promo (red box) --- */
+    .promo{
+      position:relative;
+      margin-top:18px;
+      background:linear-gradient(180deg, rgba(255,107,107,.15), rgba(255,107,107,.08));
+      border:1px solid #7a2020;
+    }
+    .promo h2{
+      font-size:17px;
+      margin:0 0 10px 0;
+      color:#ffdede;
+    }
+    .promo p{margin:0 0 12px 0;color:#ffb8b8}
+    .promo-btn{
+      display:inline-block;
+      text-decoration:none;
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid #a43a3a;
+      background:#7a2020;
+      color:#fff;
+      font-size:14px;
+    }
+    .promo-btn:hover{filter:brightness(1.06)}
+    .promo-logo{
+      position:absolute; top:12px; left:12px;  /* ← از راست به چپ منتقل شد */
+      display:inline-flex; align-items:center; justify-content:center;
+      width:32px; height:32px; border-radius:8px;
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1)
+    }
+    .promo-logo img{max-width:22px; max-height:22px; opacity:.95; display:block}
   </style>
 </head>
 <body>
@@ -90,7 +122,7 @@
       </div>
 
       <h3>هاست‌ها</h3>
-      <div id="httpHosts" class="muted">بعد از «اسکن 3x-ui» یا اضافه‌کردن مسیرها، اینجا لیست می‌شود.</div>
+      <div id="httpHosts" class="muted">بعد از «اسکن ۳x-ui» یا اضافه‌کردن مسیرها، اینجا لیست می‌شود.</div>
     </card>
   </div>
 
@@ -123,6 +155,19 @@
       </tbody>
     </table>
   </card>
+
+  <!-- ==== Promo Box (DigitalVPS) ==== -->
+  <card class="promo" id="promo-digitalvps">
+    <!-- TODO: لینک روی لوگو را اینجا بگذارید -->
+    <a class="promo-logo" href="#" target="_blank" rel="noopener">
+      <!-- TODO: آدرس فایل لوگو را اینجا بگذارید -->
+      <img src="https://client.digitalvps.ir/templates/lagom2/assets/img/logo/logo_big.1066038415.png" alt="DigitalVPS logo">
+    </a>
+    <h2>خرید سرور ایران و خارج با کیفیت با پورت 10Gb/s از دیجیتال وی‌پی‌اس</h2>
+    <p>زیرساخت پرسرعت، پایداری بالا و تحویل سریع.</p>
+    <a class="promo-btn" href="https://client.digitalvps.ir/aff.php?aff=52" target="_blank" rel="noopener">مشاهده</a>
+  </card>
+  <!-- ==== /Promo Box ==== -->
 
   <script>
     const $ = s => document.querySelector(s);
