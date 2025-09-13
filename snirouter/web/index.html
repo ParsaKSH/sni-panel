@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SNI Router Panel — github.com/ParsaKSH</title>
+  <style>
+    :root{
+      --bg:#0f1f26; --panel:#24414b; --line:#2f5561; --txt:#e8f3f7; --muted:#9fb4bc; --accent:#14e1c6;
+      --danger:#ff6b6b; --ok:#22c55e;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Inter,Helvetica,Arial;
+      background:radial-gradient(90rem 90rem at 20% -10%,#17333d 0%,#0f1f26 40%,#0b171c 100%);
+      color:var(--txt);padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .brand small{color:var(--muted);font-weight:500}
+    .row{display:flex;flex-wrap:wrap;gap:8px}
+    .grid{display:grid;grid-template-columns:1fr;gap:18px}
+    @media(min-width:1100px){.grid{grid-template-columns:1fr 1fr}}
+    card{display:block;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+      border:1px solid #1e3942;border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+    h2{margin:0 0 12px 0;font-size:18px}
+    h3{margin:0 0 10px 0;font-size:15px;color:var(--muted)}
+    input,button,select{font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#132930;color:var(--txt)}
+    input::placeholder{color:#89a2ab}
+    button{cursor:pointer;border:1px solid #1b8f82;background:#134a53}
+    button:hover{filter:brightness(1.06)}
+    .ghost{background:transparent;border-color:#2a4d58}
+    .ok{background:#0f3f2a;border-color:#1b6d48}
+    .danger{background:#3d1414;border-color:#7a2020}
+    table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden}
+    th,td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-size:13px}
+    th{color:#b9cbd0;background:#1a323a}
+    .muted{color:var(--muted)}
+    .tag{padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px;display:inline-block}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span style="font-size:20px">SNI Router Panel</span>
+      <small>— <a href="https://github.com/ParsaKSH" target="_blank" rel="noopener" style="color:var(--accent)">github.com/ParsaKSH</a></small>
+    </div>
+    <div class="row">
+      <button id="btnInstall">نصب/فعال‌سازی Nginx</button>
+      <button id="btnReload" class="ghost">Reload Nginx</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <card>
+      <h2>TLS (SNI) Stream</h2>
+      <h3>Upstream پیش‌فرض</h3>
+      <div class="row" style="margin-bottom:8px">
+        <input id="defaultUp" placeholder="مثلاً 127.0.0.1:4433" class="grow" style="min-width:260px"/>
+        <button id="btnSetDefault" class="ok">ذخیره</button>
+      </div>
+
+      <h3>افزودن/به‌روزرسانی SNI → Upstream</h3>
+      <div class="row" style="margin-bottom:8px">
+        <input id="sni" placeholder="مثلاً example.com" style="min-width:220px"/>
+        <input id="upstream" placeholder="مثلاً 127.0.0.1:2053" style="min-width:220px"/>
+        <button id="btnAdd">افزودن/به‌روزرسانی</button>
+      </div>
+
+      <h3>لیست Mapping ها</h3>
+      <table>
+        <thead><tr><th>SNI</th><th>Upstream</th><th>عملیات</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </card>
+
+    <card>
+      <h2>HTTP Host/Path Routing</h2>
+      <h3>Upstream پیش‌فرض HTTP</h3>
+      <div class="row" style="margin-bottom:8px">
+        <input id="httpDefault" placeholder="مثلاً 127.0.0.1:8081" style="min-width:260px"/>
+        <button id="btnSetHTTPDefault" class="ok">ذخیره</button>
+      </div>
+
+      <h3>افزودن/به‌روزرسانی Host/Path</h3>
+      <div class="row" style="margin-bottom:8px">
+        <input id="httpHost" placeholder="مثلاً site.com"/>
+        <input id="httpPath" placeholder="مثلاً /app/"/>
+        <input id="httpUp" placeholder="مثلاً 127.0.0.1:9000"/>
+        <label><input type="checkbox" id="httpFallback"/> مسیر پیش‌فرض</label>
+        <button id="btnAddHTTP">افزودن/به‌روزرسانی</button>
+      </div>
+
+      <h3>هاست‌ها</h3>
+      <div id="httpHosts" class="muted">بعد از «اسکن 3x-ui» یا اضافه‌کردن مسیرها، اینجا لیست می‌شود.</div>
+    </card>
+  </div>
+
+  <card style="margin-top:18px">
+    <div class="row" style="justify-content:space-between">
+      <h2>۳x-ui (x-ui) — یکپارچه‌سازی</h2>
+      <div class="muted" id="xuiPath"></div>
+    </div>
+
+    <div class="row" style="margin:8px 0 12px">
+      <button id="btnXUIScan">اسکن تنظیمات</button>
+      <button id="btnXUIApplySel" class="ok">اعمال انتخاب‌شده</button>
+      <button id="btnXUIApplyAll" class="ghost">اعمال همه</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>انتخاب</th>
+          <th>نوع</th>
+          <th>پورت</th>
+          <th>SNI</th>
+          <th>Host</th>
+          <th>Path</th>
+          <th>Remark</th>
+        </tr>
+      </thead>
+      <tbody id="xuiRows">
+        <tr><td colspan="7" class="muted">برای مشاهده روی «اسکن تنظیمات» کلیک کنید.</td></tr>
+      </tbody>
+    </table>
+  </card>
+
+  <script>
+    const $ = s => document.querySelector(s);
+
+    async function loadConfig() {
+      const res = await fetch('api/config'); const c = await res.json();
+      $('#defaultUp').value = c.default_upstream || '';
+      $('#httpDefault').value = c.default_http_upstream || '';
+      renderHTTPHosts(c.http_hosts||[]);
+      try { const st = await (await fetch('api/xui/status')).json();
+        $('#xuiPath').textContent = st.present ? `مسیر دیتابیس: ${st.path}` : '۳x-ui شناسایی نشد';
+      } catch {}
+    }
+    function renderHTTPHosts(hosts){
+      const box = $('#httpHosts');
+      if (!hosts.length){ box.innerHTML = '<span class="muted">چیزی تنظیم نشده.</span>'; return; }
+      let html = '<table><thead><tr><th>Host</th><th>Path</th><th>Upstream</th><th>عملیات</th></tr></thead><tbody>';
+      hosts.forEach(h=>{
+        (h.paths||[]).forEach(p=>{
+          html += `<tr><td>${h.host}</td><td>${p.path_prefix}</td><td>${p.upstream}</td>
+          <td><button class="danger" data-delhost="${h.host}" data-delpath="${p.path_prefix}">حذف</button></td></tr>`;
+        });
+        if (h.fallback){
+          html += `<tr><td>${h.host}</td><td class="muted">/ (fallback)</td><td>${h.fallback}</td><td></td></tr>`;
+        }
+      });
+      html += '</tbody></table>';
+      box.innerHTML = html;
+      box.querySelectorAll('button[data-delhost]').forEach(b=>{
+        b.onclick = async ()=>{
+          const host=b.getAttribute('data-delhost'); const path=b.getAttribute('data-delpath');
+          if(!confirm(`حذف مسیر ${path} از ${host}؟`))return;
+          const r=await fetch('api/http/route/'+encodeURIComponent(host)+'?path='+encodeURIComponent(path),{method:'DELETE'});
+          if(r.ok) loadConfig(); else alert(await r.text());
+        }
+      });
+    }
+    async function reloadNginx(){ const r=await fetch('api/reload',{method:'POST'}); if(r.ok) alert('Nginx reloaded'); else alert(await r.text()); }
+    async function installNginx(){ const r=await fetch('api/install-nginx',{method:'POST'}); if(r.ok){ alert('nginx-extras نصب/فعال شد'); loadConfig(); } else alert(await r.text()); }
+    $('#btnSetDefault').onclick = async ()=>{
+      const upstream = $('#defaultUp').value.trim();
+      const r = await fetch('api/default',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({upstream})});
+      if(r.ok) alert('Saved & Reloaded'); else alert(await r.text());
+    };
+    $('#btnAdd').onclick = async ()=>{
+      const sni=$('#sni').value.trim(), up=$('#upstream').value.trim();
+      const r=await fetch('api/stream/mapping',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sni,upstream:up})});
+      if(r.ok){ $('#sni').value=''; $('#upstream').value=''; loadConfig(); } else alert(await r.text());
+    };
+    $('#rows').addEventListener('click', async (e)=>{
+      const t=e.target.closest('button[data-sni]'); if(!t) return;
+      const sni = t.getAttribute('data-sni');
+      if(!confirm('حذف '+sni+'?')) return;
+      const r=await fetch('api/stream/mapping/'+encodeURIComponent(sni),{method:'DELETE'});
+      if(r.ok) loadConfig(); else alert(await r.text());
+    });
+    $('#btnSetHTTPDefault').onclick = async ()=>{
+      const upstream = $('#httpDefault').value.trim();
+      const r = await fetch('api/http/default',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({upstream})});
+      if(r.ok) alert('Saved & Reloaded'); else alert(await r.text());
+    };
+    $('#btnAddHTTP').onclick = async ()=>{
+      const host=$('#httpHost').value.trim(), path=$('#httpPath').value.trim()||"/", up=$('#httpUp').value.trim(), fallback=$('#httpFallback').checked;
+      const r=await fetch('api/http/route',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({host,path_prefix:path,upstream:up,fallback})});
+      if(r.ok){ $('#httpHost').value=''; $('#httpPath').value=''; $('#httpUp').value=''; $('#httpFallback').checked=false; loadConfig(); }
+      else alert(await r.text());
+    };
+
+    // X-UI
+    let xuiItems=[];
+    $('#btnXUIScan').onclick = async ()=>{
+      const r = await fetch('api/xui/scan'); const data = await r.json();
+      xuiItems = data.items||[]; renderXUI();
+    };
+    function renderXUI(){
+      const tb=$('#xuiRows');
+      if(!xuiItems.length){ tb.innerHTML='<tr><td colspan="7" class="muted">چیزی یافت نشد.</td></tr>'; return; }
+      tb.innerHTML = xuiItems.map(it=>`
+        <tr>
+          <td><input type="checkbox" class="xsel" value="${it.id}"/></td>
+          <td>${it.type.toUpperCase()}</td>
+          <td>${it.port}</td>
+          <td>${it.sni||''}</td>
+          <td>${it.host||''}</td>
+          <td>${it.path||''}</td>
+          <td><span class="muted">${it.remark||''}</span></td>
+        </tr>`).join('');
+    }
+    async function xuiApply(ids){
+      const r=await fetch('api/xui/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});
+      if(r.ok){ alert('اعمال شد و Nginx ری‌لود شد'); loadConfig(); } else alert(await r.text());
+    }
+    $('#btnXUIApplySel').onclick = ()=>{
+      const ids=[...document.querySelectorAll('.xsel:checked')].map(x=>parseInt(x.value,10));
+      if(!ids.length) return alert('هیچ موردی انتخاب نشده');
+      xuiApply(ids);
+    };
+    $('#btnXUIApplyAll').onclick = ()=> xuiApply([]);
+
+    $('#btnReload').onclick = reloadNginx;
+    $('#btnInstall').onclick = installNginx;
+
+    async function boot(){
+      await loadConfig();
+      const res = await fetch('api/config'); const c = await res.json();
+      const tbody = $('#rows'); tbody.innerHTML = '';
+      (c.mappings||[]).forEach(m=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${m.sni}</td><td>${m.upstream}</td><td><button class="danger" data-sni="${m.sni}">حذف</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    boot();
+  </script>
+</body>
+</html>
