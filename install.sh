@@ -1,10 +1,9 @@
 #bin/bash
-sudo -i
 mkdir -p /opt/snirouter
 cd /opt/snirouter
 wget https://github.com/ParsaKSH/sni-panel/releases/download/v1.0.0/sni-panel-linux-amd64
 mv sni-panel-linux-amd64 sni-panel
-
+chmod +x sni-panel
 tee /etc/systemd/system/sni-panel.service >/dev/null <<'UNIT'
 [Unit]
 Description=SNI Router Panel (github.com/ParsaKSH)
@@ -30,5 +29,5 @@ systemctl enable --now sni-panel
 systemctl restart sni-panel
 
 echo "sni-panel installed!-github.com/ParsaKSH/sni-panel"
-echo "panel: http://<server-ip>:8080/<Panel Path>
+echo "panel: http://<server-ip>:8080/<Panel Path>"
 cat /etc/snirouter/ADMIN.txt
