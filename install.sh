@@ -1,4 +1,14 @@
 #bin/bash
+GREEN="\e[32m"
+BOLD_GREEN="\e[1;32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+CYAN="\e[36m"
+MAGENTA="\e[35m"
+WHITE="\e[37m"
+RED="\e[31m"
+RESET="\e[0m"
+
 mkdir -p /opt/snirouter
 cd /opt/snirouter
 wget https://github.com/ParsaKSH/sni-panel/releases/download/v1.0.0/sni-panel-linux-amd64
@@ -28,6 +38,6 @@ systemctl daemon-reload
 systemctl enable --now sni-panel
 systemctl restart sni-panel
 
-echo "sni-panel installed!-github.com/ParsaKSH/sni-panel"
-echo "panel: http://<server-ip>:8080/<Panel Path>"
+echo -e "${GREEN}sni-panel installed!-${BLUE}github.com/ParsaKSH/sni-panel"
+echo -e "panel: http://<server-ip>:8080/<Panel Path>${RESET}"
 cat /etc/snirouter/ADMIN.txt
