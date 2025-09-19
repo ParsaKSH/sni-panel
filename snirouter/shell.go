@@ -15,5 +15,5 @@ func installNginx() error {
 	if err := sudoRun("bash", "-lc", "apt-get update"); err != nil {
 		return err
 	}
-	return sudoRun("bash", "-lc", "DEBIAN_FRONTEND=noninteractive apt-get install -y nginx-extras")
+	return sudoRun("bash", "-lc", "DEBIAN_FRONTEND=noninteractive apt-get install -y nginx-extras && sudo apt-get install nginx-full libnginx-mod-stream libnginx-mod-stream-ssl-preread")
 }
